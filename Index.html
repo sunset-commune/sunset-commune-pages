@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sunset Commune (夕霞社)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: linear-gradient(180deg, #fff7f0 0%, #f4e7dc 45%, #efe3d7 100%); min-height: 100vh; color: #2f2a28; }
+    .page { max-width: 1280px; margin: 0 auto; padding: 24px; }
+    button, input, textarea { font: inherit; }
+    .btn { padding: 12px 32px; font-size: 16px; border: none; border-radius: 999px; cursor: pointer; box-shadow: 0 4px 12px rgba(90, 55, 41, 0.12); }
+    .btn-primary { background: linear-gradient(135deg, #d97b4a, #b85c3a); color: white; }
+    .btn-secondary { background: #fff; color: #5a3729; border: 1px solid rgba(90, 55, 41, 0.15); }
+    #landing-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; text-align: center; }
+    .brand h1 { font-size: 34px; font-weight: 700; color: #5a3729; margin-bottom: 8px; }
+    .brand p { color: #7a5d50; }
+    .auth-container { display: none; max-width: 380px; margin: 90px auto; padding: 30px; background: rgba(255,255,255,0.84); border-radius: 18px; box-shadow: 0 10px 30px rgba(90,55,41,.12); }
+    .auth-container.active { display: block; }
+    .auth-container h2 { margin-bottom: 14px; color: #5a3729; }
+    .auth-container input { width: 100%; margin-bottom: 12px; padding: 12px; border: 1px solid rgba(90,55,41,0.16); border-radius: 12px; background: #fffdfb; }
+    .back-link { display: inline-block; margin-top: 12px; color: #0066cc; cursor: pointer; text-decoration: underline; font-size: 14px; }
+    #dashboard { display: none; }
+    #dashboard.active { display: block; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding: 18px 20px; background: rgba(255,255,255,0.72); border-radius: 18px; box-shadow: 0 8px 24px rgba(90,55,41,.08); }
+    .header h1 { font-size: 24px; color: #5a3729; }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .sections-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .section-card { background: rgba(255,255,255,0.85); border-radius: 18px; padding: 20px; box-shadow: 0 10px 24px rgba(90,55,41,.08); }
+    .section-card h2 { font-size: 18px; margin-bottom: 15px; color: #5a3729; }
+    .section-card textarea, .section-card input[type="text"], .section-card input[type="url"] { width: 100%; padding: 12px; border: 1px solid rgba(90,55,41,0.16); border-radius: 12px; font-size: 14px; margin-bottom: 10px; background: #fffdfb; color: #2f2a28; }
+    .section-card textarea { min-height: 100px; resize: vertical; }
+    .posts-list { margin-top: 15px; max-height: 220px; overflow-y: auto; }
+    .post-item { padding: 10px 12px; background: #fff9f5; border-radius: 10px; margin-bottom: 8px; font-size: 13px; border: 1px solid rgba(90,55,41,.08); }
+    .article-title-btn { cursor: pointer; color: #5a3729; font-weight: 700; text-decoration: underline; }
+    .article-view { margin-top: 15px; padding: 12px; border: 1px solid rgba(90,55,41,0.08); border-radius: 12px; background: #fff9f5; display: none; }
+  </style>
+</head>
+<body>
+  <div id="landing-page" class="page">
+    <div class="brand">
+      <h1>Sunset Commune (夕霞社)</h1>
+      <p>A simple place to share community posts, ideas, and useful information.</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn-signin-landing">Sign In</button>
+    <button type="button" class="btn btn-secondary" id="btn-create-landing">Create Account</button>
+  </div>
+
+  <div id="signin-form" class="auth-container">
+    <h2>Sign In</h2>
+    <input type="text" id="signin-nickname" placeholder="Nickname" autocomplete="off" />
+    <input type="password" id="signin-password" placeholder="Password" autocomplete="off" />
+    <button type="button" class="btn btn-primary" id="btn-do-signin">Sign In</button>
+    <span class="back-link" id="back-from-signin">← Back</span>
+  </div>
+
+  <div id="create-account-form" class="auth-container">
+    <h2>Create Account</h2>
+    <input type="text" id="create-nickname" placeholder="Nickname" autocomplete="off" />
+    <input type="password" id="create-password" placeholder="Password" autocomplete="off" />
+    <button type="button" class="btn btn-primary" id="btn-do-create">Create Account</button>
+    <span class="back-link" id="back-from-create">← Back</span>
+  </div>
+
+  <div id="dashboard" class="page">
+    <div class="header">
+      <h1>Sunset Commune (夕霞社)</h1>
+      <div class="user-info"><label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#5a3729;"><input type="password" id="admin-pin" placeholder="Admin PIN" style="width:90px;padding:6px 8px;border-radius:8px;border:1px solid rgba(90,55,41,0.16);font-size:12px;"><input type="checkbox" id="admin-toggle" disabled>Admin</label>
+        <span>Welcome, <strong id="user-nickname">User</strong></span>
+        <button type="button" class="btn btn-secondary" id="btn-signout">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="sections-grid">
+      <div class="section-card">
+        <h2>📌 Bulletin Board</h2>
+        <textarea id="bulletin-input" placeholder="Post an announcement..."></textarea>
+        <input type="url" id="bulletin-link" placeholder="Add a link (optional, e.g. https://...)" />
+        <button type="button" class="btn btn-primary" id="btn-bulletin-post">Post</button>
+        <div class="posts-list" id="bulletin-posts"></div>
+      </div>
+
+      <div class="section-card">
+        <h2>💬 Discussion</h2>
+        <textarea id="discussion-input" placeholder="Start a discussion..."></textarea>
+        <button type="button" class="btn btn-primary" id="btn-discussion-post">Post</button>
+        <div class="posts-list" id="discussion-posts"></div>
+        <div id="REMOVED_DISQUS_thread" style="margin-top:16px;"></div>
+      </div>
+
+      <div class="section-card">
+        <h2>📝 Articles</h2>
+        <input type="text" id="article-title" placeholder="Article title" />
+        <textarea id="article-content" placeholder="Article content..."></textarea>
+        <button type="button" class="btn btn-primary" id="btn-article-post">Post</button>
+        <div class="posts-list" id="articles-posts"></div>
+        <div id="article-view" class="article-view"></div>
+      </div>
+
+      <div class="section-card">
+        <h2>ℹ️ Useful Information</h2>
+        <textarea id="info-input" placeholder="Share useful information..."></textarea>
+        <input type="url" id="info-link" placeholder="Add a link (optional, e.g. https://...)" />
+        <input type="file" id="info-pdf" accept="application/pdf" style="width:100%;padding:10px 0 12px 0;font-size:14px;" />
+        <div id="info-debug" style="font-size:12px;color:#7a5d50;margin-top:-4px;margin-bottom:10px;">ready</div>
+        <button type="button" class="btn btn-primary" id="btn-info-post">Post</button>
+        <div class="posts-list" id="info-posts"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let users = JSON.parse(localStorage.getItem('users') || '{}');
+    let posts = JSON.parse(localStorage.getItem('posts') || '{"bulletin":[],"discussion":[],"articles":[],"info":[]}');
+    let currentUser = null;
+    const ADMIN_PIN = '2477';
+
+    function unlockAdmin() {
+      const pin = (document.getElementById('admin-pin')?.value || '').trim();
+      const box = document.getElementById('admin-toggle');
+      if (!box) return;
+      box.disabled = pin !== ADMIN_PIN;
+      if (pin !== ADMIN_PIN) box.checked = false;
+      loadAllPosts();
+    }
+
+    function saveUsers() { localStorage.setItem('users', JSON.stringify(users)); }
+    function savePosts() { localStorage.setItem('posts', JSON.stringify(posts)); }
+
+    function showLanding() { document.getElementById('landing-page').style.display = 'flex'; document.getElementById('signin-form').classList.remove('active'); document.getElementById('create-account-form').classList.remove('active'); document.getElementById('dashboard').classList.remove('active'); }
+    function showSignIn() { document.getElementById('landing-page').style.display = 'none'; document.getElementById('signin-form').classList.add('active'); document.getElementById('create-account-form').classList.remove('active'); document.getElementById('dashboard').classList.remove('active'); }
+    function showCreateAccount() { document.getElementById('landing-page').style.display = 'none'; document.getElementById('signin-form').classList.remove('active'); document.getElementById('create-account-form').classList.add('active'); document.getElementById('dashboard').classList.remove('active'); }
+    function showDashboard() { document.getElementById('landing-page').style.display = 'none'; document.getElementById('signin-form').classList.remove('active'); document.getElementById('create-account-form').classList.remove('active'); document.getElementById('dashboard').classList.add('active'); document.getElementById('user-nickname').textContent = currentUser; loadAllPosts();  }
+
+    function handleCreateAccount() {
+      const nickname = document.getElementById('create-nickname').value.trim();
+      const password = document.getElementById('create-password').value;
+      if (!nickname || !password) { alert('Please enter both nickname and password'); return; }
+      if (users[nickname]) { alert('Nickname already exists'); return; }
+      users[nickname] = password;
+      saveUsers();
+      document.getElementById('signin-nickname').value = nickname;
+      document.getElementById('signin-password').value = '';
+      document.getElementById('create-nickname').value = '';
+      document.getElementById('create-password').value = '';
+      alert('Account created successfully!');
+      showSignIn();
+    }
+
+    function handleSignIn() {
+      const nickname = document.getElementById('signin-nickname').value.trim();
+      const password = document.getElementById('signin-password').value;
+      if (!users[nickname] || users[nickname] !== password) { alert('Invalid nickname or password'); return; }
+      currentUser = nickname;
+      showDashboard();
+    }
+
+    function handleSignOut() { currentUser = null; showLanding(); }
+
+    function postBulletin() {
+      const content = document.getElementById('bulletin-input').value.trim();
+      const link = document.getElementById('bulletin-link').value.trim();
+      if (!content) { alert('Please enter a bulletin message'); return; }
+      if (link && !/^https?:\/\//i.test(link)) { alert('Please include http:// or https:// in the link'); return; }
+      posts.bulletin.unshift({ user: currentUser, content, link, timestamp: new Date().toISOString() });
+      savePosts();
+      document.getElementById('bulletin-input').value = '';
+      document.getElementById('bulletin-link').value = '';
+      renderPosts('bulletin');
+    }
+
+    function postDiscussion() {
+      const content = document.getElementById('discussion-input').value.trim();
+      if (!content) return;
+      posts.discussion.unshift({ user: currentUser, content, timestamp: new Date().toISOString(), replies: [] });
+      savePosts();
+      document.getElementById('discussion-input').value = '';
+      renderPosts('discussion');
+    }
+
+    function postArticle() {
+      const title = document.getElementById('article-title').value.trim();
+      const content = document.getElementById('article-content').value.trim();
+      if (!title || !content) { alert('Please enter both title and content'); return; }
+      posts.articles.unshift({ user: currentUser, title, content, timestamp: new Date().toISOString() });
+      savePosts();
+      document.getElementById('article-title').value = '';
+      document.getElementById('article-content').value = '';
+      renderPosts('articles');
+      hideArticleView();
+    }
+
+    function postInfoDirect() {
+      const contentEl = document.getElementById('info-input');
+      const linkEl = document.getElementById('info-link');
+      const pdfEl = document.getElementById('info-pdf');
+      const dbg = document.getElementById('info-debug');
+      const content = contentEl.value.trim();
+      const link = linkEl.value.trim();
+      const file = pdfEl ? pdfEl.files[0] : null;
+      if (dbg) dbg.textContent = 'clicked';
+      if (!content) { alert('Please enter information text'); return; }
+      if (link && !/^https?:\/\//i.test(link)) { alert('Please include http:// or https:// in the link'); return; }
+      const saveAndRender = (pdfData, pdfName) => {
+        posts.info.unshift({ user: currentUser, content, link, pdfName: pdfName || '', pdfData: pdfData || '', timestamp: new Date().toISOString() });
+        savePosts();
+        contentEl.value = '';
+        linkEl.value = '';
+        if (pdfEl) pdfEl.value = '';
+        renderPosts('info');
+        if (dbg) dbg.textContent = 'posted';
+      };
+      if (!file) { saveAndRender('', ''); return; }
+      const reader = new FileReader();
+      reader.onload = function(e) { saveAndRender(e.target.result, file.name); };
+      reader.onerror = function() { alert('Could not read PDF'); if (dbg) dbg.textContent = 'error'; };
+      reader.readAsDataURL(file);
+    }
+
+    function loadDisqus() {
+      if (window.REMOVED_DISQUSLoaded) return;
+      window.REMOVED_DISQUSLoaded = true;
+      window.REMOVED_DISQUS_config = function () {
+        this.page.url = window.location.href;
+        this.page.identifier = 'sunset-commune-discussion';
+      };
+      const d = document, s = d.createElement('script');
+      s.src = 'https://sunsetcommune.REMOVED_DISQUS.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+
+    function showArticle(index) {
+      const article = posts.articles[index];
+      const view = document.getElementById('article-view');
+      if (!article) return;
+      view.style.display = 'block';
+      view.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;"><div style="font-weight:700;font-size:16px;color:#5a3729;">' + article.title + '</div><button type="button" id="close-article-btn" style="border:none;background:transparent;color:#0066cc;cursor:pointer;text-decoration:underline;padding:0;">Close</button></div>' + '<div style="font-size:13px;color:#7a5d50;margin-bottom:10px;">By ' + article.user + '</div>' + '<div style="white-space:pre-wrap;line-height:1.5;color:#2f2a28;">' + article.content + '</div>';
+      const closeBtn = document.getElementById('close-article-btn');
+      if (closeBtn) closeBtn.addEventListener('click', hideArticleView);
+    }
+    function hideArticleView() { const view = document.getElementById('article-view'); view.style.display = 'none'; view.innerHTML = ''; }
+
+    function renderPosts(section) {
+      const container = document.getElementById(section + '-posts');
+      if (!container) return;
+      if (section === 'articles') {
+        container.innerHTML = posts.articles.map((post, index) => `
+          <div class="post-item">
+            <span class="article-title-btn" data-article-index="${index}">${post.title}</span>
+            <button type="button" class="btn btn-secondary btn-delete-post" data-section="articles" data-index="${index}" style="margin-left:8px;display:none;">Delete</button>
+          </div>
+        `).join('');
+        const isAdmin = document.getElementById('admin-toggle')?.checked;
+        container.querySelectorAll('.btn-delete-post').forEach(b => b.style.display = isAdmin ? 'inline-block' : 'none');
+        container.querySelectorAll('[data-article-index]').forEach(el => el.addEventListener('click', () => showArticle(parseInt(el.dataset.articleIndex, 10))));
+        container.querySelectorAll('.btn-delete-post').forEach(btn => btn.addEventListener('click', function() {
+          if (!document.getElementById('admin-toggle')?.checked) return;
+          const idx = Number(this.dataset.index);
+          if (!confirm('Delete this article?')) return;
+          posts.articles.splice(idx, 1);
+          savePosts();
+          loadAllPosts();
+        }));
+        return;
+      }
+      if (section === 'info') {
+        container.innerHTML = posts.info.map((post, index) => {
+          const linkHtml = post.link ? `<div style="margin-top:6px;"><a href="${post.link}" target="_blank" rel="noopener noreferrer">Open link</a></div>` : '';
+          const pdfHtml = post.pdfData ? `<div style="margin-top:6px;"><a href="${post.pdfData}" download="${post.pdfName}" target="_blank" rel="noopener noreferrer">Download PDF: ${post.pdfName}</a></div>` : (post.pdfName ? `<div style="margin-top:6px;color:#7a5d50;">PDF attached: ${post.pdfName}</div>` : '');
+          return `<div class="post-item"><strong>${post.user}:</strong> ${post.content}${linkHtml}${pdfHtml}<div style="margin-top:8px;"><button type="button" class="btn btn-secondary btn-delete-post" data-section="info" data-index="${index}" style="display:none;">Delete</button></div></div>`;
+        }).join('');
+        const isAdmin = document.getElementById('admin-toggle')?.checked;
+        container.querySelectorAll('.btn-delete-post').forEach(b => b.style.display = isAdmin ? 'inline-block' : 'none');
+        container.querySelectorAll('.btn-delete-post').forEach(btn => btn.addEventListener('click', function() {
+          if (!document.getElementById('admin-toggle')?.checked) return;
+          const idx = Number(this.dataset.index);
+          if (!confirm('Delete this useful information item?')) return;
+          posts.info.splice(idx, 1);
+          savePosts();
+          loadAllPosts();
+        }));
+        return;
+      }
+      if (section === 'discussion') {
+        container.innerHTML = posts.discussion.map((post, index) => {
+          const replies = (post.replies || []).map(r => `<div class="post-item" style="margin-top:8px;background:#fffdfb;"><strong>Reply:</strong> ${r.content}</div>`).join('');
+          const delBtn = `<button type="button" class="btn btn-secondary btn-delete-post" data-section="discussion" data-index="${index}" style="margin-left:8px;display:none;">Delete</button>`;
+          return `<div class="post-item"><strong>${post.user}:</strong> ${post.content}<div style="margin-top:10px;"><button type="button" class="btn btn-secondary btn-reply" data-discussion-index="${index}" style="display:inline-block !important; visibility:visible !important; opacity:1 !important;">Reply</button>${delBtn}</div><div class="reply-box" data-replybox="${index}" style="display:none; margin-top:10px;"><textarea class="reply-input" placeholder="Write a reply to this question..."></textarea><button type="button" class="btn btn-primary btn-send-reply" data-discussion-index="${index}" style="margin-top:8px;">Post Reply</button></div>${replies}</div>`;
+        }).join('');
+        const isAdmin = document.getElementById('admin-toggle')?.checked;
+        container.querySelectorAll('.btn-delete-post').forEach(b => b.style.display = isAdmin ? 'inline-block' : 'none');
+        container.querySelectorAll('.btn-reply').forEach(btn => btn.addEventListener('click', function() {
+          const idx = Number(this.dataset.discussionIndex);
+          const box = container.querySelector('[data-replybox="' + idx + '"]');
+          if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }));
+        container.querySelectorAll('.btn-send-reply').forEach(btn => btn.addEventListener('click', function() {
+          const idx = Number(this.dataset.discussionIndex);
+          const box = container.querySelector('[data-replybox="' + idx + '"]');
+          const ta = box ? box.querySelector('.reply-input') : null;
+          const text = ta ? ta.value.trim() : '';
+          if (!text) return;
+          posts.discussion[idx].replies = posts.discussion[idx].replies || [];
+          posts.discussion[idx].replies.push({ content: text, timestamp: new Date().toISOString() });
+          savePosts();
+          loadAllPosts();
+        }));
+        container.querySelectorAll('.btn-delete-post').forEach(btn => btn.addEventListener('click', function() {
+          if (!document.getElementById('admin-toggle')?.checked) return;
+          const idx = Number(this.dataset.index);
+          if (!confirm('Delete this message?')) return;
+          posts.discussion.splice(idx, 1);
+          savePosts();
+          loadAllPosts();
+        }));
+        return;
+      }
+      container.innerHTML = posts[section].map((post, index) => {
+        const linkHtml = section === 'bulletin' && post.link ? `<div style="margin-top:6px;"><a href="${post.link}" target="_blank" rel="noopener noreferrer">More details</a></div>` : '';
+        const delBtn = (section === 'bulletin') ? `<button type="button" class="btn btn-secondary btn-delete-post" data-section="bulletin" data-index="${index}" style="margin-left:8px;display:none;">Delete</button>` : '';
+        return `<div class="post-item"><strong>${post.user}:</strong> ${post.content}${linkHtml}<div style="margin-top:8px;">${delBtn}</div></div>`;
+      }).join('');
+      const isAdmin = document.getElementById('admin-toggle')?.checked;
+      container.querySelectorAll('.btn-delete-post').forEach(b => b.style.display = isAdmin ? 'inline-block' : 'none');
+      container.querySelectorAll('.btn-delete-post').forEach(btn => btn.addEventListener('click', function() {
+        if (!document.getElementById('admin-toggle')?.checked) return;
+        const sectionName = this.dataset.section;
+        const idx = Number(this.dataset.index);
+        if (!confirm('Delete this message?')) return;
+        posts[sectionName].splice(idx, 1);
+        savePosts();
+        loadAllPosts();
+      }));
+    }
+
+    function loadAllPosts() { ['bulletin','discussion','articles','info'].forEach(renderPosts); }
+
+    function bindUI() {
+      document.getElementById('btn-signin-landing').addEventListener('click', showSignIn);
+      document.getElementById('btn-create-landing').addEventListener('click', showCreateAccount);
+      document.getElementById('back-from-signin').addEventListener('click', showLanding);
+      document.getElementById('back-from-create').addEventListener('click', showLanding);
+      document.getElementById('btn-do-signin').addEventListener('click', handleSignIn);
+      document.getElementById('btn-do-create').addEventListener('click', handleCreateAccount);
+      document.getElementById('btn-signout').addEventListener('click', handleSignOut);
+      document.getElementById('btn-bulletin-post').addEventListener('click', postBulletin);
+      document.getElementById('btn-discussion-post').addEventListener('click', postDiscussion);
+      document.getElementById('btn-article-post').addEventListener('click', postArticle);
+      document.getElementById('btn-info-post').addEventListener('click', postInfoDirect);
+      const adminToggle = document.getElementById('admin-toggle'); if (adminToggle) adminToggle.addEventListener('change', loadAllPosts);
+      const adminPin = document.getElementById('admin-pin'); if (adminPin) adminPin.addEventListener('input', unlockAdmin);
+    }
+
+    bindUI();
+    showLanding();
+  </script>
+</body>
+</html>
